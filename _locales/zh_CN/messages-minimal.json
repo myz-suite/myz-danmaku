@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "MyZ 弹幕",
+    "description": "Extension name for Chrome Web Store"
+  },
+  "extensionDescription": {
+    "message": "将 YouTube 评论作为弹幕叠加显示，并与弹出窗口同步。",
+    "description": "Extension description for Chrome Web Store"
+  },
+  "extensionDefaultTitle": {
+    "message": "MyZ 弹幕",
+    "description": "Extension default title for Chrome Web Store"
+  }
+}

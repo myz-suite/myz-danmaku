@@ -1,0 +1,118 @@
+{
+  "extensionName": {
+    "message": "MyZ 弹幕",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "将 YouTube 评论作为弹幕叠加显示，并与弹出窗口同步。",
+    "description": "Extension description"
+  },
+  "extensionDefaultTitle": {
+    "message": "MyZ 弹幕",
+    "description": "Extension default title"
+  },
+  "popupTitle": {
+    "message": "MyZ 弹幕",
+    "description": "Popup window title"
+  },
+  "refreshButton": {
+    "message": "刷新",
+    "description": "Refresh button text"
+  },
+  "refreshButtonAriaLabel": {
+    "message": "刷新弹幕列表",
+    "description": "Refresh button aria-label"
+  },
+  "loadingStatus": {
+    "message": "加载中…",
+    "description": "Loading status text"
+  },
+  "danmakuCount": {
+    "message": "共 $count$ 条弹幕",
+    "description": "Danmaku count message",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "10"
+      }
+    }
+  },
+  "notVideoPage": {
+    "message": "当前页面不是视频播放",
+    "description": "Message when current page is not a video"
+  },
+  "noDanmakuAvailable": {
+    "message": "暂时没有可显示的弹幕",
+    "description": "Message when no danmaku is available"
+  },
+  "loadError": {
+    "message": "加载弹幕时出现错误",
+    "description": "Error message when loading danmaku fails"
+  },
+  "anonymousAuthor": {
+    "message": "匿名",
+    "description": "Anonymous author label"
+  },
+  "pinnedBadge": {
+    "message": "置顶",
+    "description": "Pinned badge text"
+  },
+  "likeCount": {
+    "message": "👍 $count$",
+    "description": "Like count format",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "supportLink": {
+    "message": "遇到问题？提交支持请求",
+    "description": "Support link text"
+  },
+  "danmakuButton": {
+    "message": "弹",
+    "description": "Danmaku button text"
+  },
+  "danmakuButtonTitle": {
+    "message": "发送弹幕 (Enter)",
+    "description": "Danmaku button title"
+  },
+  "danmakuButtonAriaLabel": {
+    "message": "发送弹幕",
+    "description": "Danmaku button aria-label"
+  },
+  "sendUnavailableNotice": {
+    "message": "发送弹幕功能暂未实现，请在评论区通过时间码来发送弹幕。",
+    "description": "Notice when send danmaku is unavailable"
+  },
+  "settingsButtonAriaLabel": {
+    "message": "设置",
+    "description": "Settings button aria-label"
+  },
+  "languageModalTitle": {
+    "message": "语言设置",
+    "description": "Language modal title"
+  },
+  "closeButtonAriaLabel": {
+    "message": "关闭",
+    "description": "Close button aria-label"
+  },
+  "chineseLanguage": {
+    "message": "中文 (简体)",
+    "description": "Chinese language option"
+  },
+  "englishLanguage": {
+    "message": "English",
+    "description": "English language option"
+  },
+  "saveButton": {
+    "message": "保存",
+    "description": "Save button text"
+  },
+  "cancelButton": {
+    "message": "取消",
+    "description": "Cancel button text"
+  }
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="120" y1="40" x2="720" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B6B"/>
+      <stop offset="1" stop-color="#C22222"/>
+    </linearGradient>
+    <linearGradient id="shineGradient" x1="120" y1="80" x2="520" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#B2082C" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <g filter="url(#softShadow)">
+    <path d="M140 40H660C729 40 780 91 780 160V640C780 709 729 760 660 760H140C71 760 20 709 20 640V160C20 91 71 40 140 40Z" fill="url(#bgGradient)"/>
+  </g>
+  <path d="M140 40H660C729 40 780 91 780 160V640C780 709 729 760 660 760H140C71 760 20 709 20 640V160C20 91 71 40 140 40Z" stroke="#FFE4EA" stroke-width="16"/>
+  <path d="M120 140C120 108 145 84 176 84H624C655 84 680 108 680 140V340C680 371 655 396 624 396H176C145 396 120 371 120 340V140Z" fill="url(#shineGradient)"/>
+  <g fill-rule="evenodd" clip-rule="evenodd">
+    <path fill="#FFFFFF" d="M164 220H300C376 220 444 276 444 352C444 426 384 480 314 484L272 486L250 540H164V220Z"/>
+    <path fill="#FFE3EB" d="M236 292H300C332 292 372 320 372 352C372 384 332 412 300 412H260L236 476V292Z" opacity="0.75"/>
+    <path fill="#FFFFFF" d="M444 540V220H524L560 324L596 220H676V540H612V370L576 460H544L508 370V540H444Z"/>
+    <path fill="#FFE3EB" d="M512 280H540L560 344L580 280H608L576 374H544L512 280Z" opacity="0.7"/>
+  </g>
+</svg>

@@ -1,0 +1,37 @@
+{
+  "name": "myz-danmaku",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.ts",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "dependencies": {
+    "youtubei.js": "^16.0.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.2.1",
+    "@eslint/compat": "^1.4.0",
+    "@playwright/test": "^1.56.1",
+    "@types/chrome": "^0.1.1",
+    "@types/node": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^61.1.12",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "globals": "^15.13.0",
+    "prettier": "^3.6.2",
+    "sharp": "^0.33.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.0.5",
+    "vite-plugin-zip-pack": "^1.2.4"
+  }
+}

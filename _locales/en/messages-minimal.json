@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "MyZ Danmaku",
+    "description": "Extension name for Chrome Web Store"
+  },
+  "extensionDescription": {
+    "message": "Overlay YouTube comments as danmaku and sync with popup.",
+    "description": "Extension description for Chrome Web Store"
+  },
+  "extensionDefaultTitle": {
+    "message": "MyZ Danmaku",
+    "description": "Extension default title for Chrome Web Store"
+  }
+}

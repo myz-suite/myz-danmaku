@@ -1,0 +1,79 @@
+# MyZ Danmaku
+
+MyZ Danmaku 是一个实验性的 Chrome 扩展，能够为 YouTube 播放器叠加来自带时间码的评论，模拟弹幕体验。扩展会定期抓取当前视频的评论，将识别出时间标记的回复与视频时间轴同步，在顶部浮层按行展示，并提供一个行动按钮弹窗来浏览已解析的弹幕列表。
+
+## 主要特性
+
+- **评论→弹幕转换**：通过 youtubei.js 抓取评论树，识别时间码并构建弹幕条目。
+- **播放器顶部浮层**：在视频顶部渲染弹幕轨道，每条弹幕根据文案长度、时间分组动态排布，避免重叠。
+- **离线缓存**：弹幕数据存入 IndexedDB，并在背景页、内容脚本、弹窗之间同步，支持 MV3 Service Worker 的生命周期。
+- **Popup 列表**：弹窗展示完整弹幕列表，并提供快捷入口前往支持页面提交反馈。
+- **徽标提醒**：扩展图标徽标显示解析到的弹幕数量，便于用户快速获知当前视频的弹幕量。
+- **YouTube 会话感知**：在 SPA 导航或页面刷新后自动识别当前视频 ID 并恢复弹幕缓存；在网络错误时优雅降级并清理过期快照。
+
+## 开发与构建
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发模式（Vite）
+npm run dev
+
+# 生成生产构建（输出至 dist/）
+npm run build
+
+# 图标生成脚本（会从 assets/icons/icon-template.svg 导出多个尺寸的 PNG）
+npm run icons
+
+# 代码质量
+npm run lint
+npm run typecheck
+```
+
+## 使用说明
+
+- 在 YouTube 的 `watch` 页面（例如 `https://www.youtube.com/watch?v=...`）加载扩展后，内容脚本会在播放器顶部创建弹幕浮层。
+- 弹幕来源是包含时间码的评论与回复（例如 “1:23 这段太赞了”），扩展解析时间并与当前播放进度对齐。
+- 点击扩展图标可打开弹窗查看解析到的弹幕列表，支持手动刷新。
+- 如果切换视频或通过站内导航进入新视频，扩展会自动识别视频 ID 并尝试从本地缓存恢复弹幕。
+
+## 文件结构
+
+```
+assets/
+  icons/                # SVG 模板与生成 PNG 的源文件
+public/
+  icons/                # 打包时使用的各尺寸图标
+src/
+  background.ts         # MV3 Service Worker：抓取缓存、徽标更新、消息路由
+  content.ts            # 内容脚本：视频识别、弹幕浮层、评论抓取
+  popup/                # Popup UI、样式与行为逻辑
+  manifest.ts           # 扩展清单（由 @crxjs/vite-plugin 输出）
+  content.css           # 弹幕浮层的样式，包括轨道与动画
+```
+
+## 工作原理概览
+
+1. **定位视频 ID**：内容脚本监控 `history` 变化和 `yt-navigate-finish` 事件，以获得当前页面的视频 ID。
+2. **抓取评论**：使用 `youtubei.js/web` 的客户端 API 分页请求评论，识别包含时间码的条目及其回复。
+3. **构建弹幕条目**：对每个时间戳生成唯一 ID，并标准化作者、文案、点赞数等元信息。
+4. **缓存与同步**：抓取结果写入 IndexedDB，并通过 `chrome.runtime.sendMessage` 同步至背景页和弹窗。
+5. **渲染弹幕**：内容脚本按照轨道顺序、文本宽度等约束在视频顶部渲染动画化的弹幕元素。
+6. **用户界面**：弹窗读取缓存展示弹幕列表，支持手动刷新；操作按钮徽标显示当前解析数量。
+
+### IndexedDB 缓存与消息路由
+
+- 缓存库：`myz-danmaku-cache`，对象仓库为 `danmaku`。
+- 背景脚本负责读写缓存，并通过 `chrome.runtime.onMessage` 提供 `danmaku:update`、`danmaku:get`、`danmaku:popup-data` 等消息入口。
+- 内容脚本在解析完成后会发送 `danmaku:update` 请求写入快照；弹窗使用 `danmaku:popup-data` 获取当前视频的条目用于展示。
+
+## 支持与反馈
+
+如果在使用过程中遇到问题，请访问支持页面提交 issue：
+
+- GitHub Issues: <https://github.com/myz-suite/myz-support/issues>
+
+---
+
+本项目目前处于实验阶段，API 或交互可能会随时调整。欢迎反馈改进意见，帮助我们完善 MyZ Danmaku 的体验。

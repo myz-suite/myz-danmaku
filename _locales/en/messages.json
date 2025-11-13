@@ -1,0 +1,118 @@
+{
+  "extensionName": {
+    "message": "MyZ Danmaku",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Overlay YouTube comments as danmaku and sync with popup.",
+    "description": "Extension description"
+  },
+  "extensionDefaultTitle": {
+    "message": "MyZ Danmaku",
+    "description": "Extension default title"
+  },
+  "popupTitle": {
+    "message": "MyZ Danmaku",
+    "description": "Popup window title"
+  },
+  "refreshButton": {
+    "message": "Refresh",
+    "description": "Refresh button text"
+  },
+  "refreshButtonAriaLabel": {
+    "message": "Refresh danmaku list",
+    "description": "Refresh button aria-label"
+  },
+  "loadingStatus": {
+    "message": "Loading…",
+    "description": "Loading status text"
+  },
+  "danmakuCount": {
+    "message": "$count$ danmaku total",
+    "description": "Danmaku count message",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "10"
+      }
+    }
+  },
+  "notVideoPage": {
+    "message": "Current page is not a video playback",
+    "description": "Message when current page is not a video"
+  },
+  "noDanmakuAvailable": {
+    "message": "No danmaku available to display",
+    "description": "Message when no danmaku is available"
+  },
+  "loadError": {
+    "message": "Error occurred while loading danmaku",
+    "description": "Error message when loading danmaku fails"
+  },
+  "anonymousAuthor": {
+    "message": "Anonymous",
+    "description": "Anonymous author label"
+  },
+  "pinnedBadge": {
+    "message": "Pinned",
+    "description": "Pinned badge text"
+  },
+  "likeCount": {
+    "message": "👍 $count$",
+    "description": "Like count format",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "supportLink": {
+    "message": "Having issues? Submit a support request",
+    "description": "Support link text"
+  },
+  "danmakuButton": {
+    "message": "弹",
+    "description": "Danmaku button text"
+  },
+  "danmakuButtonTitle": {
+    "message": "Send danmaku (Enter)",
+    "description": "Danmaku button title"
+  },
+  "danmakuButtonAriaLabel": {
+    "message": "Send danmaku",
+    "description": "Danmaku button aria-label"
+  },
+  "sendUnavailableNotice": {
+    "message": "Danmaku sending is not yet implemented. Please send danmaku through timecodes in the comments section.",
+    "description": "Notice when send danmaku is unavailable"
+  },
+  "settingsButtonAriaLabel": {
+    "message": "Settings",
+    "description": "Settings button aria-label"
+  },
+  "languageModalTitle": {
+    "message": "Language Settings",
+    "description": "Language modal title"
+  },
+  "closeButtonAriaLabel": {
+    "message": "Close",
+    "description": "Close button aria-label"
+  },
+  "chineseLanguage": {
+    "message": "Chinese (Simplified)",
+    "description": "Chinese language option"
+  },
+  "englishLanguage": {
+    "message": "English",
+    "description": "English language option"
+  },
+  "saveButton": {
+    "message": "Save",
+    "description": "Save button text"
+  },
+  "cancelButton": {
+    "message": "Cancel",
+    "description": "Cancel button text"
+  }
+}

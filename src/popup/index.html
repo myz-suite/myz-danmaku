@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>MyZ Danmaku</title>
+	</head>
+	<body>
+		<main class="popup" id="app">
+			<header class="popup__header">
+				<h1 class="popup__title" data-i18n="popupTitle">MyZ 弹幕</h1>
+				<div class="popup__controls">
+					<button
+						type="button"
+						class="popup__refresh"
+						data-role="refresh"
+						data-i18n-aria="refreshButtonAriaLabel"
+						title="Refresh"
+					>
+						<span data-i18n="refreshButton">刷新</span>
+					</button>
+					<button
+						type="button"
+						class="popup__settings"
+						data-role="settings"
+						data-i18n-aria="settingsButtonAriaLabel"
+						title="Settings"
+					>
+						⚙️
+					</button>
+				</div>
+			</header>
+			<p class="popup__status" data-role="status" data-i18n="loadingStatus">加载中…</p>
+			<ul class="popup__list" data-role="list" aria-live="polite"></ul>
+			<footer class="popup__footer">
+				<a
+					class="popup__support-link"
+					href="https://github.com/myz-suite/myz-support/issues"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<span data-i18n="supportLink">遇到问题？提交支持请求</span>
+				</a>
+			</footer>
+		</main>
+		
+		<!-- Language Selection Modal -->
+		<div class="modal" id="languageModal" role="dialog" aria-labelledby="languageModalTitle" aria-hidden="true">
+			<div class="modal__backdrop" data-role="modal-backdrop"></div>
+			<div class="modal__content">
+				<header class="modal__header">
+					<h2 class="modal__title" id="languageModalTitle" data-i18n="languageModalTitle">语言设置</h2>
+					<button type="button" class="modal__close" data-role="modal-close" data-i18n-aria="closeButtonAriaLabel">×</button>
+				</header>
+				<div class="modal__body">
+					<div class="language-selector">
+						<label class="language-option">
+							<input type="radio" name="language" value="zh_CN" class="language-option__input">
+							<span class="language-option__label" data-i18n="chineseLanguage">中文 (简体)</span>
+						</label>
+						<label class="language-option">
+							<input type="radio" name="language" value="en" class="language-option__input">
+							<span class="language-option__label" data-i18n="englishLanguage">English</span>
+						</label>
+					</div>
+				</div>
+				<footer class="modal__footer">
+					<button type="button" class="modal__button modal__button--primary" data-role="save-language" data-i18n="saveButton">保存</button>
+					<button type="button" class="modal__button modal__button--secondary" data-role="cancel-language" data-i18n="cancelButton">取消</button>
+				</footer>
+			</div>
+		</div>
+		
+		<script type="module" src="./main.ts"></script>
+	</body>
+</html>
