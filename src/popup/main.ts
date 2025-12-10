@@ -1,20 +1,21 @@
 /// <reference types="chrome" />
 import "./style.css";
-import { LANGUAGE_STORAGE_KEY } from "../shared/constants";
+import type { DanmakuEntry } from "../shared/danmaku";
 import { t, getCurrentLanguage, setLanguage, onLanguageChange, type Language } from "../shared/i18n";
-
-interface DanmakuEntry {
-  id: string;
-  videoId: string;
-  content: string;
-  seconds: number;
-  author: string;
-  publishedText: string;
-  likeCount: number;
-  isPinned: boolean;
-}
-
-type StatusTone = "info" | "ready" | "error";
+import {
+  getBrowserLanguage,
+  getStoredLanguage,
+  saveLanguagePreference,
+  subscribeToLanguageChanges
+} from "../shared/language";
+import {
+  DEFAULT_SETTINGS as DEFAULT_DANMAKU_SETTINGS,
+  getStoredSettings,
+  subscribeToSettingsChanges,
+  updateSettings,
+  type DanmakuSettings
+} from "../shared/settings";
+import { createPopupRenderer, updateStaticText } from "./ui";
 
 const statusElement = document.querySelector<HTMLElement>('[data-role="status"]');
 const listElement = document.querySelector<HTMLUListElement>('[data-role="list"]');
@@ -26,55 +27,14 @@ const modalCloseButton = document.querySelector<HTMLButtonElement>('[data-role="
 const saveLanguageButton = document.querySelector<HTMLButtonElement>('[data-role="save-language"]');
 const cancelLanguageButton = document.querySelector<HTMLButtonElement>('[data-role="cancel-language"]');
 const languageRadioButtons = document.querySelectorAll<HTMLInputElement>('input[name="language"]');
+const fontSizeSelect = document.querySelector<HTMLSelectElement>('[data-role="font-size"]');
+const pageCountInput = document.querySelector<HTMLInputElement>('[data-role="page-count"]');
+
+const { setStatus, clearList, renderEntries } = createPopupRenderer({ statusElement, listElement });
 
 // Store the element that had focus before opening the modal
 let activeElementBeforeModal: HTMLElement | null = null;
-
-// Hybrid i18n strategy:
-// 1. Use Chrome i18n for initial language detection (for store compatibility)
-// 2. Use our custom i18n for dynamic language switching (for user experience)
-// 3. Store user preference in chrome.storage for persistence
-
-function getBrowserLanguage(): Language {
-  // Get browser language and map to our supported languages
-  const browserLang = navigator.language || navigator.languages[0] || 'zh-CN';
-  
-  if (browserLang.startsWith('zh')) {
-    return 'zh_CN';
-  }
-  
-  if (browserLang.startsWith('en')) {
-    return 'en';
-  }
-  
-  // Fallback to Chrome's i18n API if available
-  try {
-    const chromeLang = chrome.i18n?.getUILanguage?.();
-    if (chromeLang?.startsWith('zh')) return 'zh_CN';
-    if (chromeLang?.startsWith('en')) return 'en';
-  } catch {
-    // Chrome i18n not available, use default
-  }
-  
-  return 'zh_CN'; // Default to Chinese
-}
-
-async function getStoredLanguage(): Promise<Language> {
-  try {
-    const result = await chrome.storage.sync.get(LANGUAGE_STORAGE_KEY);
-    return (result[LANGUAGE_STORAGE_KEY] as Language) || getBrowserLanguage();
-  } catch {
-    return getBrowserLanguage();
-  }
-}
-
-async function saveLanguage(language: Language): Promise<void> {
-  try {
-    await chrome.storage.sync.set({ [LANGUAGE_STORAGE_KEY]: language });
-  } catch (error) {
-    console.warn('Failed to save language preference:', error);
-  }
-}
+let currentSettings: DanmakuSettings = DEFAULT_DANMAKU_SETTINGS;
 
 function updateHtmlLangAttribute(language: Language): void {
   const html = document.documentElement;
@@ -85,114 +45,33 @@ function updateHtmlLangAttribute(language: Language): void {
   html.lang = langMap[language] || 'zh-Hans';
 }
 
-// Initialize i18n for static elements
-function initializeI18n(): void {
-  // Update static text elements
-  const elements = document.querySelectorAll<HTMLElement>('[data-i18n]');
-  elements.forEach(element => {
-    const key = element.dataset.i18n;
-    if (key) {
-      const text = t(key);
-      if (text && text !== key) {
-        element.textContent = text;
-      }
-    }
-  });
-
-  // Update aria-label attributes
-  const ariaElements = document.querySelectorAll<HTMLElement>('[data-i18n-aria]');
-  ariaElements.forEach(element => {
-    const key = element.dataset.i18nAria;
-    if (key) {
-      const text = t(key);
-      if (text && text !== key) {
-        element.setAttribute('aria-label', text);
-      }
-    }
-  });
-  
-  // Update page title
-  document.title = t('extensionDefaultTitle');
+function readFontScaleControl(): number {
+  if (!fontSizeSelect) {
+    return currentSettings.fontScale;
+  }
+  const value = Number.parseFloat(fontSizeSelect.value);
+  return Number.isFinite(value) ? value : currentSettings.fontScale;
 }
 
-function formatTimestamp(totalSeconds: number): string {
-  const seconds = Math.max(0, Math.floor(totalSeconds));
-  const h = Math.floor(seconds / 3_600);
-  const m = Math.floor((seconds % 3_600) / 60);
-  const s = seconds % 60;
-  if (h > 0) {
-    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+function readPageLimitControl(): number {
+  if (!pageCountInput) {
+    return currentSettings.pageLimit;
   }
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const value = Number.parseInt(pageCountInput.value, 10);
+  return Number.isFinite(value) ? value : currentSettings.pageLimit;
 }
 
-function setStatus(message: string, tone: StatusTone = "info"): void {
-  if (!statusElement) {
-    return;
+function syncSettingsControls(settings: DanmakuSettings): void {
+  if (fontSizeSelect) {
+    const formatted = settings.fontScale.toFixed(2);
+    const matchingOption = Array.from(fontSizeSelect.options).find(
+      option => Number.parseFloat(option.value).toFixed(2) === formatted
+    );
+    fontSizeSelect.value = matchingOption ? matchingOption.value : fontSizeSelect.value || "1";
   }
-  statusElement.textContent = message;
-  statusElement.dataset.tone = tone;
-}
-
-function clearList(): void {
-  if (!listElement) {
-    return;
+  if (pageCountInput) {
+    pageCountInput.value = String(settings.pageLimit);
   }
-  while (listElement.firstChild) {
-    listElement.removeChild(listElement.firstChild);
-  }
-}
-
-function renderEntries(entries: DanmakuEntry[]): void {
-  if (!statusElement || !listElement) {
-    return;
-  }
-  clearList();
-  setStatus(t("danmakuCount", String(entries.length)), "ready");
-
-  entries.forEach(entry => {
-    const item = document.createElement("li");
-    item.className = "popup__item";
-    item.dataset.id = entry.id;
-
-    const header = document.createElement("div");
-    header.className = "popup__item-header";
-
-    const timestamp = document.createElement("span");
-    timestamp.className = "popup__timestamp";
-    timestamp.textContent = formatTimestamp(entry.seconds);
-    timestamp.title = entry.publishedText || "";
-
-    const author = document.createElement("span");
-    author.className = "popup__author";
-    author.textContent = entry.author || t("anonymousAuthor");
-
-    header.appendChild(timestamp);
-    header.appendChild(author);
-
-    if (entry.isPinned) {
-      const badge = document.createElement("span");
-      badge.className = "popup__badge popup__badge--pin";
-      badge.textContent = t("pinnedBadge");
-      header.appendChild(badge);
-    }
-
-    if (entry.likeCount > 0) {
-      const likes = document.createElement("span");
-      likes.className = "popup__meta popup__meta--likes";
-      likes.textContent = t("likeCount", String(entry.likeCount));
-      header.appendChild(likes);
-    }
-
-    item.appendChild(header);
-
-    const body = document.createElement("p");
-    body.className = "popup__content";
-    body.textContent = entry.content;
-    item.appendChild(body);
-
-    listElement.appendChild(item);
-  });
 }
 
 function queryActiveTab(): Promise<chrome.tabs.Tab | null> {
@@ -301,6 +180,7 @@ function openLanguageModal(): void {
   languageRadioButtons.forEach(radio => {
     radio.checked = radio.value === getCurrentLanguage();
   });
+  syncSettingsControls(currentSettings);
   
   // Focus on the modal close button
   modalCloseButton?.focus();
@@ -319,19 +199,34 @@ function closeLanguageModal(): void {
   activeElementBeforeModal = null;
 }
 
-function saveLanguageSelection(): void {
+async function handleModalSave(): Promise<void> {
   const selectedLanguage = Array.from(languageRadioButtons).find(radio => radio.checked)?.value as Language;
+  let shouldReload = false;
   if (selectedLanguage && selectedLanguage !== getCurrentLanguage()) {
     setLanguage(selectedLanguage);
     updateHtmlLangAttribute(selectedLanguage);
-    void saveLanguage(selectedLanguage);
-    
-    // Re-initialize UI with new language
-    initializeI18n();
-    
-    // Refresh the danmaku list to update dynamic content
+    await saveLanguagePreference(selectedLanguage);
+    updateStaticText();
+    shouldReload = true;
+  }
+
+  const requestedFontScale = readFontScaleControl();
+  const requestedPageLimit = readPageLimitControl();
+  if (
+    requestedFontScale !== currentSettings.fontScale ||
+    requestedPageLimit !== currentSettings.pageLimit
+  ) {
+    currentSettings = await updateSettings({
+      fontScale: requestedFontScale,
+      pageLimit: requestedPageLimit
+    });
+    shouldReload = true;
+  }
+
+  if (shouldReload) {
     void loadDanmaku(false);
   }
+
   closeLanguageModal();
 }
 
@@ -346,7 +241,9 @@ settingsButton?.addEventListener("click", () => {
 
 modalCloseButton?.addEventListener("click", closeLanguageModal);
 modalBackdrop?.addEventListener("click", closeLanguageModal);
-saveLanguageButton?.addEventListener("click", saveLanguageSelection);
+saveLanguageButton?.addEventListener("click", () => {
+  void handleModalSave();
+});
 cancelLanguageButton?.addEventListener("click", closeLanguageModal);
 
 // Handle Escape key to close modal
@@ -358,34 +255,40 @@ document.addEventListener("keydown", (event) => {
 
 // Initialize
 async function initialize() {
-  // Get stored language preference or detect browser language
-  const storedLanguage = await getStoredLanguage();
+  const [storedLanguage, storedSettings] = await Promise.all([
+    getStoredLanguage(getBrowserLanguage()),
+    getStoredSettings()
+  ]);
   setLanguage(storedLanguage);
   updateHtmlLangAttribute(storedLanguage);
-  
-  // Listen for language changes from storage (triggered by other parts of extension)
-  chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (namespace === 'sync' && changes[LANGUAGE_STORAGE_KEY]) {
-      const newLanguage = changes[LANGUAGE_STORAGE_KEY].newValue as Language;
-      if (newLanguage && newLanguage !== getCurrentLanguage()) {
-        setLanguage(newLanguage);
-        updateHtmlLangAttribute(newLanguage);
-        initializeI18n();
-        void loadDanmaku(false);
-      }
+  updateStaticText();
+
+  currentSettings = storedSettings;
+  syncSettingsControls(currentSettings);
+
+  subscribeToLanguageChanges(newLanguage => {
+    if (newLanguage && newLanguage !== getCurrentLanguage()) {
+      setLanguage(newLanguage);
+      updateHtmlLangAttribute(newLanguage);
+      updateStaticText();
+      void loadDanmaku(false);
     }
   });
-  
-  // Listen for our internal language changes
+
   onLanguageChange(() => {
-    initializeI18n();
+    updateStaticText();
     void loadDanmaku(false);
   });
-  
-  // Initialize i18n
-  initializeI18n();
-  
-  // Load danmaku
+
+  subscribeToSettingsChanges(settings => {
+    const previous = currentSettings;
+    currentSettings = settings;
+    syncSettingsControls(settings);
+    if (settings.pageLimit !== previous.pageLimit) {
+      void loadDanmaku(false);
+    }
+  });
+
   void loadDanmaku();
 }
 

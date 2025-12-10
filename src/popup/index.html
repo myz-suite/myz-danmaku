@@ -63,6 +63,28 @@
 							<span class="language-option__label" data-i18n="englishLanguage">English</span>
 						</label>
 					</div>
+					<div class="settings-group">
+						<label class="settings-group__label" for="fontSizeSelect" data-i18n="fontSizeLabel">弹幕字体大小</label>
+						<select id="fontSizeSelect" class="settings-control" data-role="font-size">
+							<option value="0.85" data-i18n="fontSizeSmall">偏小</option>
+							<option value="1" data-i18n="fontSizeMedium">默认</option>
+							<option value="1.2" data-i18n="fontSizeLarge">偏大</option>
+						</select>
+						<p class="settings-group__description" data-i18n="fontSizeDescription">调节叠加弹幕的字体大小</p>
+					</div>
+					<div class="settings-group">
+						<label class="settings-group__label" for="pageCountInput" data-i18n="pageCountLabel">评论抓取页数</label>
+						<input
+							id="pageCountInput"
+							class="settings-control"
+							type="number"
+							min="1"
+							max="60"
+							step="1"
+							data-role="page-count"
+						/>
+						<p class="settings-group__description" data-i18n="pageCountDescription">设置每次刷新时加载的评论页数（1-60）</p>
+					</div>
 				</div>
 				<footer class="modal__footer">
 					<button type="button" class="modal__button modal__button--primary" data-role="save-language" data-i18n="saveButton">保存</button>

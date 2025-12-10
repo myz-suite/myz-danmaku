@@ -2,3 +2,4 @@
 
 export const LANGUAGE_STORAGE_KEY = 'myz-danmaku-language';
 export const DEFAULT_LANGUAGE = 'zh_CN' as const;
+export const SETTINGS_STORAGE_KEY = 'myz-danmaku-settings';

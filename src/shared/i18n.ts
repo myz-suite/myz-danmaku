@@ -36,6 +36,13 @@ export const messages: Record<Language, Messages> = {
     englishLanguage: 'English',
     saveButton: '保存',
     cancelButton: '取消',
+    fontSizeLabel: '弹幕字体大小',
+    fontSizeDescription: '调整播放器内弹幕文字的尺寸。',
+    fontSizeSmall: '偏小',
+    fontSizeMedium: '默认',
+    fontSizeLarge: '偏大',
+    pageCountLabel: '评论抓取页数',
+    pageCountDescription: '每次刷新时加载的评论页数（1-60）。',
     
     // Content script
     danmakuButton: '弹',
@@ -72,6 +79,13 @@ export const messages: Record<Language, Messages> = {
     englishLanguage: 'English',
     saveButton: 'Save',
     cancelButton: 'Cancel',
+    fontSizeLabel: 'Danmaku font size',
+    fontSizeDescription: 'Adjust the size of overlay comments on the video.',
+    fontSizeSmall: 'Smaller',
+    fontSizeMedium: 'Default',
+    fontSizeLarge: 'Larger',
+    pageCountLabel: 'Comment pages to load',
+    pageCountDescription: 'Number of comment pages to fetch per refresh (1-60).',
     
     // Content script
     danmakuButton: '弹',
