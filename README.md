@@ -1,87 +1,130 @@
 # MyZ Danmaku
 
-MyZ Danmaku 是一个实验性的 Chrome 扩展，能够为 YouTube 播放器叠加来自带时间码的评论，模拟弹幕体验。扩展会定期抓取当前视频的评论，将识别出时间标记的回复与视频时间轴同步，在顶部浮层按行展示，并提供一个行动按钮弹窗来浏览已解析的弹幕列表。
+MyZ Danmaku 是一个 Chrome 浏览器扩展（Manifest V3），为 YouTube 播放器叠加来自评论区的弹幕。扩展会抓取当前视频的评论，解析其中包含的时间标记，将弹幕与视频时间轴同步，在播放器顶部以动画轨道的形式展示。
 
-## 主要特性
+> **注意**：本扩展依赖 [youtubei.js](https://github.com/LuanRT/YouTube.js) 作为第三方库与 YouTube 内部接口通信。YouTube 的接口可能随时变更，这可能导致扩展功能暂时失效。遇到此类问题请关注上游库的更新。
 
-- **评论→弹幕转换**：通过 youtubei.js 抓取评论树，识别时间码并构建弹幕条目。
-- **播放器顶部浮层**：在视频顶部渲染弹幕轨道，每条弹幕根据文案长度、时间分组动态排布，避免重叠。
-- **离线缓存**：弹幕数据存入 IndexedDB，并在背景页、内容脚本、弹窗之间同步，支持 MV3 Service Worker 的生命周期。
-- **Popup 列表**：弹窗展示完整弹幕列表，并提供快捷入口前往支持页面提交反馈。
-- **徽标提醒**：扩展图标徽标显示解析到的弹幕数量，便于用户快速获知当前视频的弹幕量。
-- **时间轴指示**：在 YouTube 进度条上绘制弹幕刻度，快速了解某些时间段是否存在大量评论弹幕。
-- **自定义弹幕体验**：Popup 设置面板允许调整浮层字体大小以及每次抓取的评论页数（1-60 页），偏好会在各页面之间同步。
-- **YouTube 会话感知**：在 SPA 导航或页面刷新后自动识别当前视频 ID 并恢复弹幕缓存；在网络错误时优雅降级并清理过期快照。
+## 功能特性
 
-## 开发与构建
+- **评论转弹幕** — 通过 youtubei.js 抓取评论树，自动识别含时间码的评论（如 `1:23 这段太赞了`），构建弹幕条目
+- **播放器浮层渲染** — 在视频顶部创建弹幕轨道，根据文本长度与时间分组动态排布，避免重叠
+- **离线缓存** — 弹幕数据存入 IndexedDB，支持跨后台脚本、内容脚本、弹窗同步
+- **Popup 弹幕列表** — 点击扩展图标查看完整弹幕列表，支持手动刷新
+- **徽标计数** — 扩展图标徽标实时显示当前视频的弹幕数量
+- **时间轴指示** — 在 YouTube 进度条上绘制弹幕刻度标记
+- **自定义设置** — 弹幕字体大小（偏小/默认/偏大）与评论抓取页数（1–60 页）可调
+- **SPA 导航感知** — 支持 YouTube 单页应用内的视频切换，自动恢复弹幕缓存
+- **多语言** — 支持简体中文与英文界面
+
+## 技术栈
+
+| 类别 | 技术 |
+|------|------|
+| 语言 | TypeScript |
+| 构建 | Vite + @crxjs/vite-plugin |
+| 扩展规范 | Chrome Manifest V3 |
+| 弹幕数据源 | [youtubei.js](https://github.com/LuanRT/YouTube.js) v16+ |
+| 测试 | Playwright |
+| 代码规范 | ESLint + Prettier |
+
+## 开发
 
 ```bash
 # 安装依赖
 npm install
 
-# 启动开发模式（Vite）
+# 启动开发模式（Vite HMR + CRX 热更新）
 npm run dev
 
-# 生成生产构建（输出至 dist/）
+# 类型检查
+npm run typecheck
+
+# 代码规范检查
+npm run lint
+```
+
+## 构建
+
+```bash
+# 生产构建（输出至 dist/，同时在 release/ 生成 zip 包）
 npm run build
 
-# 图标生成脚本（会从 assets/icons/icon-template.svg 导出多个尺寸的 PNG）
+# 预览构建产物
+npm run preview
+```
+
+## 图标生成
+
+```bash
+# 从 SVG 模板导出多尺寸 PNG
 npm run icons
-
-# 代码质量
-npm run lint
-npm run typecheck
 ```
 
-## 使用说明
+源文件位于 `assets/icons/icon-template.svg`，生成产物输出到 `public/icons/`。
 
-- 在 YouTube 的 `watch` 页面（例如 `https://www.youtube.com/watch?v=...`）加载扩展后，内容脚本会在播放器顶部创建弹幕浮层。
-- 弹幕来源是包含时间码的评论与回复（例如 “1:23 这段太赞了”），扩展解析时间并与当前播放进度对齐。
-- 点击扩展图标可打开弹窗查看解析到的弹幕列表，支持手动刷新。
-- 如果切换视频或通过站内导航进入新视频，扩展会自动识别视频 ID 并尝试从本地缓存恢复弹幕。
-- 设置按钮可打开偏好面板：在这里可以切换弹幕字体大小（影响浮层）与评论抓取页数（决定每次解析多少评论页），修改后会即时同步到内容脚本与后台。
-
-### 设置面板
-
-- **字体大小**：提供偏小 / 默认 / 偏大三档，对应浮层 `fontScale`。适合在大屏或分屏场景扩展可读性。
-- **评论抓取页数**：可在 1–60 页之间选择；抓取更多页可以获取更多含时间码的评论，但也会增加抓取时间与 API 请求次数。数值更新后，内容脚本会立即根据新的页数重新拉取数据。*** End Patch*** End Patch
-
-## 文件结构
+## 项目结构
 
 ```
-assets/
-  icons/                # SVG 模板与生成 PNG 的源文件
-public/
-  icons/                # 打包时使用的各尺寸图标
-src/
-  background.ts         # MV3 Service Worker：抓取缓存、徽标更新、消息路由
-  content.ts            # 内容脚本：视频识别、弹幕浮层、评论抓取
-  popup/                # Popup UI、样式与行为逻辑
-  manifest.ts           # 扩展清单（由 @crxjs/vite-plugin 输出）
-  content.css           # 弹幕浮层的样式，包括轨道与动画
+├── _locales/              # Chrome i18n 多语言文件
+│   ├── en/
+│   └── zh_CN/
+├── assets/
+│   └── icons/             # SVG 模板与图标源文件
+├── public/
+│   └── icons/             # 打包时使用的多尺寸 PNG 图标
+├── scripts/
+│   └── generate-icons.mjs # 图标生成脚本
+├── src/
+│   ├── background.ts      # Service Worker：缓存管理、徽标更新、消息路由
+│   ├── content.ts         # 内容脚本：视频识别、评论抓取、弹幕浮层管理
+│   ├── content.css        # 弹幕浮层样式（轨道、动画）
+│   ├── manifest.ts        # 扩展清单（由 @crxjs/vite-plugin 构建）
+│   ├── content/
+│   │   ├── network.ts     # youtubei.js 通信层，评论抓取与解析
+│   │   └── ui.ts          # 弹幕浮层 DOM 操作与动画控制
+│   ├── popup/
+│   │   ├── index.html     # Popup 页面
+│   │   ├── main.ts        # Popup 入口
+│   │   ├── ui.ts          # Popup 渲染逻辑
+│   │   └── style.css      # Popup 样式
+│   └── shared/
+│       ├── constants.ts   # 共享常量
+│       ├── danmaku.ts     # 弹幕数据类型定义
+│       ├── i18n.ts        # 自定义 i18n 系统
+│       ├── language.ts    # 语言偏好管理
+│       ├── settings.ts    # 扩展设置管理
+│       └── storage.ts     # IndexedDB 缓存操作
+└── test/
+    └── multipleline_test.ts
 ```
 
-## 工作原理概览
+## 工作原理
 
-1. **定位视频 ID**：内容脚本监控 `history` 变化和 `yt-navigate-finish` 事件，以获得当前页面的视频 ID。
-2. **抓取评论**：使用 `youtubei.js/web` 的客户端 API 分页请求评论，识别包含时间码的条目及其回复。
-3. **构建弹幕条目**：对每个时间戳生成唯一 ID，并标准化作者、文案、点赞数等元信息；若评论按行列出多个时间点，会被拆分为多条独立弹幕。
-4. **缓存与同步**：抓取结果写入 IndexedDB，并通过 `chrome.runtime.sendMessage` 同步至背景页和弹窗。
-5. **渲染弹幕**：内容脚本按照轨道顺序、文本宽度等约束在视频顶部渲染动画化的弹幕元素。
-6. **用户界面**：弹窗读取缓存展示弹幕列表，支持手动刷新；操作按钮徽标显示当前解析数量。
+1. **视频识别** — 内容脚本监听 `history` 变化与 `yt-navigate-finish` 事件，获取当前页面视频 ID
+2. **评论抓取** — 通过 `youtubei.js/web` 分页请求评论区，解析含时间码的评论及其回复
+3. **弹幕构建** — 将每个时间戳映射为唯一弹幕条目，支持一条评论包含多个时间点时自动拆分
+4. **缓存同步** — 抓取结果写入 IndexedDB，通过 `chrome.runtime.sendMessage` 同步至背景页与弹窗
+5. **弹幕渲染** — 内容脚本按轨道顺序与文本宽度约束，在视频顶部创建动画元素
+6. **用户交互** — 弹窗读取缓存展示列表；操作按钮徽标显示解析数量；时间轴标记指示弹幕分布
 
-### IndexedDB 缓存与消息路由
+### 缓存与消息协议
 
-- 缓存库：`myz-danmaku-cache`，对象仓库为 `danmaku`。
-- 背景脚本负责读写缓存，并通过 `chrome.runtime.onMessage` 提供 `danmaku:update`、`danmaku:get`、`danmaku:popup-data` 等消息入口。
-- 内容脚本在解析完成后会发送 `danmaku:update` 请求写入快照；弹窗使用 `danmaku:popup-data` 获取当前视频的条目用于展示。
+- 缓存库名：`myz-danmaku-cache`，对象仓库：`danmaku`
+- 消息类型：`danmaku:update`（写入）、`danmaku:get`（读取）、`danmaku:popup-data`（弹窗数据）、`danmaku:clear`（清除）
+
+## 权限说明
+
+| 权限 | 用途 |
+|------|------|
+| `storage` | 读写 Chrome 存储（设置与语言偏好） |
+| `activeTab` | 获取当前标签页信息以更新徽标 |
+| `tabs` | 跨标签页管理弹幕状态 |
+| `host_permissions: youtube.com` | 在 YouTube 页面注入内容脚本 |
 
 ## 支持与反馈
 
-如果在使用过程中遇到问题，请访问支持页面提交 issue：
+- GitHub Issues: <https://github.com/myz-suite/myz-danmaku/issues>
 
-- GitHub Issues: <https://github.com/myz-suite/myz-support/issues>
+## 许可
 
----
-
-本项目目前处于实验阶段，API 或交互可能会随时调整。欢迎反馈改进意见，帮助我们完善 MyZ Danmaku 的体验。
+本项目为实验性项目，API 与交互可能随时调整。欢迎反馈改进意见。
