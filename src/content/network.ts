@@ -515,16 +515,21 @@ function addEntriesFromComment(
   return added;
 }
 
+function commentNodeFromThread(thread: YTNodes.CommentThread | null | undefined): CommentNode | null {
+  if (!thread || !(thread instanceof YTNodes.CommentThread)) {
+    return null;
+  }
+  return thread.comment ?? null;
+}
+
 function gatherRepliesFromThread(thread: YTNodes.CommentThread): CommentNode[] {
   const replies: CommentNode[] = [];
-  const directReplies = thread.replies;
-  if (directReplies) {
-    directReplies.forEach(reply => {
-      if (reply instanceof YTNodes.CommentView) {
-        replies.push(reply);
-      }
-    });
-  }
+  thread.replies?.forEach(reply => {
+    const comment = commentNodeFromThread(reply);
+    if (comment) {
+      replies.push(comment);
+    }
+  });
   const legacyReplies = thread.comment_replies_data?.contents;
   if (legacyReplies) {
     legacyReplies.forEach(item => {
@@ -559,10 +564,26 @@ async function collectEntriesFromThread(
 
   if (thread.has_replies) {
     try {
-      const repliesThread = await enqueueRequest(() => thread.getReplies());
-      gatherRepliesFromThread(repliesThread).forEach(reply => emit(reply));
+      await enqueueRequest(() => thread.getReplies());
+      gatherRepliesFromThread(thread).forEach(reply => emit(reply));
     } catch (error) {
       console.warn("MyZ Danmaku: failed to load replies", error);
+    }
+
+    try {
+      let hasMore = false;
+      try {
+        hasMore = thread.has_continuation;
+      } catch {
+        hasMore = false;
+      }
+      while (hasMore) {
+        const continuation = await enqueueRequest(() => thread.getContinuation());
+        continuation.replies.forEach(reply => emit(commentNodeFromThread(reply)));
+        hasMore = continuation.has_continuation;
+      }
+    } catch (error) {
+      console.warn("MyZ Danmaku: failed to load replies continuation", error);
     }
   }
 

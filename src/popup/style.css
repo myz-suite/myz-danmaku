@@ -373,6 +373,21 @@ body {
 	outline-offset: 1px;
 }
 
+.settings-group__label--checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+}
+
+.settings-control--checkbox {
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	accent-color: #ff4d4f;
+	cursor: pointer;
+}
+
 .settings-group__description {
 	margin: 0;
 	font-size: 12px;

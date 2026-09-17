@@ -3,11 +3,13 @@ import { SETTINGS_STORAGE_KEY } from "./constants";
 export interface DanmakuSettings {
   fontScale: number;
   pageLimit: number;
+  promoEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: DanmakuSettings = {
   fontScale: 1,
-  pageLimit: 30
+  pageLimit: 30,
+  promoEnabled: true
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -20,7 +22,8 @@ function clamp(value: number, min: number, max: number): number {
 export function normalizeSettings(input?: Partial<DanmakuSettings> | null): DanmakuSettings {
   const merged: DanmakuSettings = {
     fontScale: DEFAULT_SETTINGS.fontScale,
-    pageLimit: DEFAULT_SETTINGS.pageLimit
+    pageLimit: DEFAULT_SETTINGS.pageLimit,
+    promoEnabled: DEFAULT_SETTINGS.promoEnabled
   };
   if (input) {
     if (typeof input.fontScale === "number") {
@@ -29,10 +32,14 @@ export function normalizeSettings(input?: Partial<DanmakuSettings> | null): Danm
     if (typeof input.pageLimit === "number") {
       merged.pageLimit = input.pageLimit;
     }
+    if (typeof input.promoEnabled === "boolean") {
+      merged.promoEnabled = input.promoEnabled;
+    }
   }
   return {
     fontScale: clamp(merged.fontScale, 0.6, 1.6),
-    pageLimit: Math.round(clamp(merged.pageLimit, 1, 60))
+    pageLimit: Math.round(clamp(merged.pageLimit, 1, 60)),
+    promoEnabled: merged.promoEnabled
   };
 }
 

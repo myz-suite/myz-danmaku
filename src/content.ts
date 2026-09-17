@@ -13,6 +13,7 @@ import {
   pauseBulletAnimations,
   reserveLane,
   queueBulletSpawn,
+  queuePromoBullet,
   resetOverlayUi,
   resumeBulletAnimations,
   setOverlayFontScale,
@@ -23,6 +24,7 @@ import {
 import type { CachedDanmakuPayload, DanmakuEntry } from "./shared/danmaku";
 import { t, onLanguageChange, setLanguage, type Language } from "./shared/i18n";
 import { getStoredLanguage, subscribeToLanguageChanges } from "./shared/language";
+import { hasPromoBeenShown, markPromoShown, resolveStoreUrl } from "./shared/promo";
 import {
   DEFAULT_SETTINGS,
   getStoredSettings,
@@ -49,6 +51,7 @@ let fetchPending = false;
 let fetchPendingForce = false;
 let lastKnownVideoTime = 0;
 let lastFetchTimestamp = 0;
+let promoPending = false;
 const displayed = new Set<string>();
 let currentSettings: DanmakuSettings = DEFAULT_SETTINGS;
 setOverlayFontScale(currentSettings.fontScale);
@@ -74,6 +77,9 @@ function getOverlayContext(): OverlayContext {
 function applySettings(settings: DanmakuSettings): void {
   currentSettings = settings;
   setOverlayFontScale(settings.fontScale);
+  if (!settings.promoEnabled) {
+    promoPending = false;
+  }
 }
 
 function refineLegacyMultilineEntry(entry: DanmakuEntry): DanmakuEntry {
@@ -371,6 +377,7 @@ function resetState(): void {
   fetchPendingForce = false;
   lastKnownVideoTime = 0;
   lastFetchTimestamp = 0;
+  promoPending = false;
   displayed.clear();
   clearPendingBulletTimers();
   clearLaneAvailability();
@@ -497,6 +504,25 @@ function tick(): void {
       currentGroupLaneHeight = baselineLaneHeight;
       currentGroupLaneCount = Math.max(1, laneCapacity);
       currentGroupWaveDelay = effectiveGroupSize > laneCapacity ? OVERLAY_WAVE_DELAY_MS : 0;
+    }
+
+    if (promoPending) {
+      promoPending = false;
+      const promoReservation = reserveLane(currentGroupLaneCount, 0);
+      queuePromoBullet(
+        {
+          text: t("promoText"),
+          href: resolveStoreUrl(),
+          title: t("promoLinkTitle")
+        },
+        promoReservation.lane,
+        currentGroupLaneHeight,
+        currentGroupLaneCount,
+        overlayHeight,
+        getOverlayContext()
+      );
+      currentGroupLaneIndex += 1;
+      void markPromoShown(currentVideoId);
     }
 
     const waveIndex = currentGroupWaveDelay > 0
@@ -632,12 +658,20 @@ async function handleLocationChange(): Promise<void> {
   currentVideoId = videoId;
   resetState();
   ensureVideoPolling();
-  const localSnapshot = await restoreDanmakuFromLocal(videoId);
-  if (localSnapshot && localSnapshot.entries.length > 0) {
+  const [localSnapshot, promoAlreadyShown] = await Promise.all([
+    restoreDanmakuFromLocal(videoId),
+    hasPromoBeenShown(videoId)
+  ]);
+  const hasCachedDanmaku = Boolean(localSnapshot && localSnapshot.entries.length > 0);
+  promoPending = currentSettings.promoEnabled && !promoAlreadyShown && !hasCachedDanmaku;
+  if (hasCachedDanmaku && localSnapshot) {
     lastFetchTimestamp = localSnapshot.storedAt;
     await applyDanmakuSnapshot(videoId, localSnapshot.entries, { sync: true });
   }
   await refreshOverlayFromCache(videoId);
+  if (danmaku.length > 0) {
+    promoPending = false;
+  }
   void requestDanmaku(videoId);
 }
 

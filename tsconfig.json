@@ -12,11 +12,7 @@
     "noEmit": true,
     "strict": true,
     "resolveJsonModule": true,
-  "types": ["chrome", "node"],
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["./*"]
-    }
+    "types": ["chrome", "node", "vite/client"]
   },
   "include": ["src"]
 }

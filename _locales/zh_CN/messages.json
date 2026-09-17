@@ -87,6 +87,22 @@
     "message": "发送弹幕功能暂未实现，请在评论区通过时间码来发送弹幕。",
     "description": "Notice when send danmaku is unavailable"
   },
+  "promoText": {
+    "message": "感谢使用 MyZ 弹幕，欢迎给个好评 ⭐",
+    "description": "Promotional danmaku text shown once per video"
+  },
+  "promoLinkTitle": {
+    "message": "点击前往扩展商店给予好评",
+    "description": "Tooltip for the promotional danmaku link"
+  },
+  "promoLabel": {
+    "message": "显示推广弹幕",
+    "description": "Settings label to enable the promotional danmaku"
+  },
+  "promoDescription": {
+    "message": "首次播放某个视频时，显示一条可点击的扩展推广弹幕。关闭后将不再显示。",
+    "description": "Settings description for the promotional danmaku option"
+  },
   "settingsButtonAriaLabel": {
     "message": "设置",
     "description": "Settings button aria-label"

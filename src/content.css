@@ -26,6 +26,19 @@
   will-change: transform, opacity;
 }
 
+.myz-danmaku-bullet--promo {
+  pointer-events: auto;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.94), rgba(255, 145, 0, 0.94));
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 2px 12px rgba(255, 77, 79, 0.55);
+}
+
+.myz-danmaku-bullet--promo:hover {
+  background: linear-gradient(135deg, rgba(255, 77, 79, 1), rgba(255, 145, 0, 1));
+}
+
 .ytp-button.myz-danmaku-send {
   display: flex;
   align-items: center;

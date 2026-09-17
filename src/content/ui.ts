@@ -253,8 +253,8 @@ export function reserveLane(laneCount: number, baseDelayMs: number): { lane: num
   return pickLane(laneCount, baseDelayMs);
 }
 
-function spawnBullet(
-  entry: DanmakuEntry,
+function mountBulletElement(
+  bullet: HTMLElement,
   laneIndex: number,
   laneHeight: number,
   laneCount: number,
@@ -276,11 +276,7 @@ function spawnBullet(
   const safeLaneIndex = Math.min(Math.max(0, Math.floor(laneIndex)), normalizedLaneCount - 1);
   const maxTop = Math.max(0, effectiveOverlayHeight - normalizedLaneHeight);
   const laneTop = Math.min(maxTop, safeLaneIndex * normalizedLaneHeight);
-  const bullet = document.createElement("div");
-  bullet.className = "myz-danmaku-bullet";
   bullet.style.top = `${laneTop}px`;
-  bullet.textContent = entry.content;
-  bullet.dataset.id = entry.id;
   bullet.dataset.lane = String(safeLaneIndex);
   overlay.appendChild(bullet);
 
@@ -347,6 +343,48 @@ function spawnBullet(
       // ignore inability to pause animation
     }
   }
+}
+
+function spawnBullet(
+  entry: DanmakuEntry,
+  laneIndex: number,
+  laneHeight: number,
+  laneCount: number,
+  overlayHeightHint: number,
+  context: OverlayContext
+): void {
+  const bullet = document.createElement("div");
+  bullet.className = "myz-danmaku-bullet";
+  bullet.textContent = entry.content;
+  bullet.dataset.id = entry.id;
+  mountBulletElement(bullet, laneIndex, laneHeight, laneCount, overlayHeightHint, context);
+}
+
+export interface PromoBulletOptions {
+  text: string;
+  href: string;
+  title?: string;
+}
+
+export function queuePromoBullet(
+  options: PromoBulletOptions,
+  laneIndex: number,
+  laneHeight: number,
+  laneCount: number,
+  overlayHeightHint: number,
+  context: OverlayContext
+): void {
+  const bullet = document.createElement("a");
+  bullet.className = "myz-danmaku-bullet myz-danmaku-bullet--promo";
+  bullet.textContent = options.text;
+  bullet.href = options.href;
+  bullet.target = "_blank";
+  bullet.rel = "noopener noreferrer";
+  bullet.dataset.promo = "true";
+  if (options.title) {
+    bullet.title = options.title;
+  }
+  mountBulletElement(bullet, laneIndex, laneHeight, laneCount, overlayHeightHint, context);
 }
 
 export function queueBulletSpawn(

@@ -43,12 +43,16 @@ export const messages: Record<Language, Messages> = {
     fontSizeLarge: '偏大',
     pageCountLabel: '评论抓取页数',
     pageCountDescription: '每次刷新时加载的评论页数（1-60）。',
+    promoLabel: '显示推广弹幕',
+    promoDescription: '首次播放某个视频时，显示一条可点击的扩展推广弹幕。关闭后将不再显示。',
     
     // Content script
     danmakuButton: '弹',
     danmakuButtonTitle: '发送弹幕 (Enter)',
     danmakuButtonAriaLabel: '发送弹幕',
-    sendUnavailableNotice: '发送弹幕功能暂未实现，请在评论区通过时间码来发送弹幕。'
+    sendUnavailableNotice: '发送弹幕功能暂未实现，请在评论区通过时间码来发送弹幕。',
+    promoText: '感谢使用 MyZ 弹幕，欢迎给个好评 ⭐',
+    promoLinkTitle: '点击前往扩展商店给予好评'
   },
   
   en: {
@@ -86,12 +90,16 @@ export const messages: Record<Language, Messages> = {
     fontSizeLarge: 'Larger',
     pageCountLabel: 'Comment pages to load',
     pageCountDescription: 'Number of comment pages to fetch per refresh (1-60).',
+    promoLabel: 'Show promotional danmaku',
+    promoDescription: 'Show one clickable promo danmaku the first time you play a video. Turn off to disable it.',
     
     // Content script
     danmakuButton: '弹',
     danmakuButtonTitle: 'Send danmaku (Enter)',
     danmakuButtonAriaLabel: 'Send danmaku',
-    sendUnavailableNotice: 'Danmaku sending is not yet implemented. Please send danmaku through timecodes in the comments section.'
+    sendUnavailableNotice: 'Danmaku sending is not yet implemented. Please send danmaku through timecodes in the comments section.',
+    promoText: 'Thanks for using MyZ Danmaku — please rate us ⭐',
+    promoLinkTitle: 'Click to rate the extension in the store'
   }
 };
 

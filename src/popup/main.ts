@@ -29,6 +29,7 @@ const cancelLanguageButton = document.querySelector<HTMLButtonElement>('[data-ro
 const languageRadioButtons = document.querySelectorAll<HTMLInputElement>('input[name="language"]');
 const fontSizeSelect = document.querySelector<HTMLSelectElement>('[data-role="font-size"]');
 const pageCountInput = document.querySelector<HTMLInputElement>('[data-role="page-count"]');
+const promoToggle = document.querySelector<HTMLInputElement>('[data-role="promo-toggle"]');
 
 const { setStatus, clearList, renderEntries } = createPopupRenderer({ statusElement, listElement });
 
@@ -61,6 +62,13 @@ function readPageLimitControl(): number {
   return Number.isFinite(value) ? value : currentSettings.pageLimit;
 }
 
+function readPromoControl(): boolean {
+  if (!promoToggle) {
+    return currentSettings.promoEnabled;
+  }
+  return promoToggle.checked;
+}
+
 function syncSettingsControls(settings: DanmakuSettings): void {
   if (fontSizeSelect) {
     const formatted = settings.fontScale.toFixed(2);
@@ -71,6 +79,9 @@ function syncSettingsControls(settings: DanmakuSettings): void {
   }
   if (pageCountInput) {
     pageCountInput.value = String(settings.pageLimit);
+  }
+  if (promoToggle) {
+    promoToggle.checked = settings.promoEnabled;
   }
 }
 
@@ -212,13 +223,16 @@ async function handleModalSave(): Promise<void> {
 
   const requestedFontScale = readFontScaleControl();
   const requestedPageLimit = readPageLimitControl();
+  const requestedPromoEnabled = readPromoControl();
   if (
     requestedFontScale !== currentSettings.fontScale ||
-    requestedPageLimit !== currentSettings.pageLimit
+    requestedPageLimit !== currentSettings.pageLimit ||
+    requestedPromoEnabled !== currentSettings.promoEnabled
   ) {
     currentSettings = await updateSettings({
       fontScale: requestedFontScale,
-      pageLimit: requestedPageLimit
+      pageLimit: requestedPageLimit,
+      promoEnabled: requestedPromoEnabled
     });
     shouldReload = true;
   }

@@ -87,6 +87,22 @@
     "message": "Danmaku sending is not yet implemented. Please send danmaku through timecodes in the comments section.",
     "description": "Notice when send danmaku is unavailable"
   },
+  "promoText": {
+    "message": "Thanks for using MyZ Danmaku — please rate us ⭐",
+    "description": "Promotional danmaku text shown once per video"
+  },
+  "promoLinkTitle": {
+    "message": "Click to rate the extension in the store",
+    "description": "Tooltip for the promotional danmaku link"
+  },
+  "promoLabel": {
+    "message": "Show promotional danmaku",
+    "description": "Settings label to enable the promotional danmaku"
+  },
+  "promoDescription": {
+    "message": "Show one clickable promo danmaku the first time you play a video. Turn off to disable it.",
+    "description": "Settings description for the promotional danmaku option"
+  },
   "settingsButtonAriaLabel": {
     "message": "Settings",
     "description": "Settings button aria-label"
